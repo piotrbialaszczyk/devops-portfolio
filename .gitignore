@@ -1,0 +1,16 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Docker
+*.tar
+
+# OS
+.DS_Store
