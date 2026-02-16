@@ -11,6 +11,12 @@ provider "aws" {
   region = "eu-central-1"
 }
 
+variable "image_tag" {
+  description = "Docker image tag to deploy"
+  type        = string
+  default     = "latest"
+}
+
 resource "aws_instance" "devops_vm" {
   ami           = "ami-0a261c0e5f51090b1"
   instance_type = "t3.micro"
@@ -21,13 +27,23 @@ resource "aws_instance" "devops_vm" {
   ]
 
   user_data = <<-EOF
-    #!/bin/bash
-    yum update -y
-    yum install -y docker
-    systemctl enable docker
-    systemctl start docker
-    usermod -aG docker ec2-user
-  EOF
+              #!/bin/bash
+              yum update -y
+
+              # Install Docker
+              yum install -y docker
+              systemctl enable docker
+              systemctl start docker
+              usermod -aG docker ec2-user
+
+              # Pull latest image
+              docker pull piotrbia/devops-portfolio-app:${var.image_tag}
+              
+              # Run container
+              docker run -d -p 8080:8080 --name app \
+                piotrbia/devops-portfolio-app:${var.image_tag}
+
+              EOF
 
   tags = {
     Name = "devops-portfolio-vm"

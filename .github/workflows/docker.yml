@@ -19,10 +19,16 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Extract short SHA
+        id: vars
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: docker/Dockerfile
           push: true
-          tags: piotrbia/devops-portfolio-app:latest
+          tags: |
+            piotrbia/devops-portfolio-app:latest
+            piotrbia/devops-portfolio-app:${{ steps.vars.outputs.SHORT_SHA }}
